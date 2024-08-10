@@ -43,6 +43,22 @@ bool Game::Initialize()
     return true;
 }
 
+void Game::RunLoop()
+{
+    while (mIsRunning) {
+        ProcessInput();
+        UpdateGame();
+        GenerateOutput();
+    }
+}
+
+void Game::Shutdown()
+{
+    SDL_DestroyRenderer(mRenderer);
+    SDL_DestroyWindow(mWindow);
+    SDL_Quit();
+}
+
 void Game::ProcessInput()
 {
     SDL_Event event;
