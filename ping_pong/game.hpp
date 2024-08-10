@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL2/SDL.h>
+
 struct Vector2
 {
     float x;
@@ -43,4 +45,6 @@ private:
 
     Vector2 mBallPos = { (float)(WINDOW_WIDTH / 2.0f), (float)(WINDOW_HEIGHT / 2.0f) };
     Vector2 mBallVel = {200.0f, -235.0f};
+
+    Uint32 mTicksToCount;
 };
