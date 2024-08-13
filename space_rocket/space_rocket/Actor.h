@@ -21,5 +21,14 @@ public:
 	virtual void UpdateActor(float deltaTime);
 
 	/* Getter, Setter */
-	const Vector2&
+	const Vector2& GetPosition() const { return mPosition; }
+
+
+private:
+	State mState;
+	Vector2 mPosition;
+	float mScale;
+	float mRotation;
+	std::vector<class Component*> mComponents;
+	class Game* mGame;
 };
