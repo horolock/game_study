@@ -25,11 +25,13 @@ public:
 	float GetScale() const { return mScale; }
 	float GetRotation() const { return mRotation; }
 	class Game* GetGame() { return mGame; }
+	State GetState() const { return mState; }
 
 	/* Setter */
 	void SetPosition(const Vector2& pos) { mPosition = pos; }
 	void SetScale(float scale) { mScale = scale; }
 	void SetRotation(float rotation) { mRotation = rotation; }
+	void SetState(State state) { mState = state; }
 
 	/* Component */
 	void AddComponent(class Component* component);

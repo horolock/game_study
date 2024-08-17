@@ -1,7 +1,7 @@
 #include "AnimSpriteComponent.h"
 #include "Math.h"
 
-AnimSpriteComponent::AnimSpriteComponent(class Actor* owner, int drawOrder = 100)
+AnimSpriteComponent::AnimSpriteComponent(class Actor* owner, int drawOrder)
 	: SpriteComponent(owner, drawOrder),
 	mCurrentFrame(0.0f),
 	mAnimFPS(24.0f)

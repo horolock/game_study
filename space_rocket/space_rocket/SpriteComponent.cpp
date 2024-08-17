@@ -2,7 +2,7 @@
 #include "Actor.h"
 #include "Game.h"
 
-SpriteComponent::SpriteComponent(class Actor* owner, int drawOrder = 100) :
+SpriteComponent::SpriteComponent(class Actor* owner, int drawOrder) :
 	Component(owner),
 	mTexture(nullptr),
 	mDrawOrder(drawOrder),
