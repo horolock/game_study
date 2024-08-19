@@ -120,17 +120,9 @@ public:
 		return temp;
 	}
 
-	static float Dot(const Vector2& a, const Vector2& b) {
-		return (a.x * b.x + a.y * b.y);
-	}
-
-	static Vector2 Lerp(const Vector2& a, const Vector2& b, float f) {
-		return Vector2(a + f * (b - a));
-	}
-
-	static Vector2 Reflect(const Vector2& v, const Vector2& n) {
-		return v - 2.0f * Vector2::Dot(v, n) * n;
-	}
+	static float Dot(const Vector2& lhs, const Vector2& rhs) { return ((lhs.x * rhs.x) + (lhs.y * rhs.y)); }
+	static Vector2 Lerp(const Vector2& lhs, const Vector2& rhs, float f) { return Vector2(lhs + f * (rhs - lhs)); }
+	static Vector2 Reflect(const Vector2& v, const Vector2& n) { return v - 2.0f * Vector2::Dot(v, n) * n; }
 
 	/* Transform vector by matrix */
 	static const Vector2 Zero;
