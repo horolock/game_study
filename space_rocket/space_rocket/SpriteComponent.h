@@ -6,6 +6,7 @@
 class SpriteComponent : public Component
 {
 public:
+	/* drawOrder lower means going to background */
 	SpriteComponent(class Actor* owner, int drawOrder = 100);
 	~SpriteComponent();
 

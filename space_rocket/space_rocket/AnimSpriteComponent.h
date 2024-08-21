@@ -3,6 +3,10 @@
 #include "SpriteComponent.h"
 #include <vector>
 
+/*
+* flipbook animation
+*/
+
 class AnimSpriteComponent : public SpriteComponent
 {
 public:

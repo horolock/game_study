@@ -135,6 +135,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 	}
 	else
 	{
+		/* Load image(sprite) from file */
 		SDL_Surface* surf = IMG_Load(fileName.c_str());
 
 		if (!surf)
@@ -143,6 +144,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 			return nullptr;
 		}
 
+		/* Create texture from SDL_Surface */
 		tex = SDL_CreateTextureFromSurface(mRenderer, surf);
 		SDL_FreeSurface(surf);
 
@@ -152,6 +154,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 			return nullptr;
 		}
 
+		/* Store texture pointer with file name for reuse texture */
 		mTextures.emplace(fileName.c_str(), tex);
 	}
 

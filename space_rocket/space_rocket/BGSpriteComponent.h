@@ -4,6 +4,10 @@
 #include <vector>
 #include "Math.h"
 
+/*
+* Scroll background
+* Image segment scroll
+*/
 class BGSpriteComponent : public SpriteComponent
 {
 public:

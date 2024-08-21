@@ -2,6 +2,10 @@
 #include "Actor.h"
 #include "Game.h"
 
+/*
+* Painter's algorithm
+*/
+
 SpriteComponent::SpriteComponent(class Actor* owner, int drawOrder) :
 	Component(owner),
 	mTexture(nullptr),
@@ -42,5 +46,7 @@ void SpriteComponent::Draw(SDL_Renderer* renderer)
 void SpriteComponent::SetTexture(SDL_Texture* texture)
 {
 	mTexture = texture;
+
+	/* Get texture width and height */
 	SDL_QueryTexture(texture, nullptr, nullptr, &mTextureWidth, &mTextureHeight);
 }

@@ -14,6 +14,7 @@ void AnimSpriteComponent::Update(float deltaTime)
 
 	if (mAnimTextures.size() > 0)
 	{
+		/* Update current frame */
 		mCurrentFrame += mAnimFPS * deltaTime;
 
 		while (mCurrentFrame >= mAnimTextures.size())
