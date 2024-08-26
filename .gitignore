@@ -1,2 +1,7 @@
 */build/
 *.dll
+*/.vs/
+*/x64/
+
+Debug/
+Release/
