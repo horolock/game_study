@@ -24,6 +24,21 @@ public:
 	/* Vector Length */
 	float LengthSquared() const { return ((x * x) + (y * y)); }
 	float Length() const { return sqrtf(LengthSquared()); }
+
+	/* Normalize */
+	void Normalize()
+	{
+		float length = Length();
+		x /= length;
+		y /= length;
+	}
+
+	static Vector2 Normalize(const Vector2& vec)
+	{
+		Vector2 temp = vec;
+		temp.Normalize();
+		return temp;
+	}
 	
 public:
 	float x;
