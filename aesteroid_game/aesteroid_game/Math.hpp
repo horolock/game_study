@@ -21,6 +21,10 @@ public:
 	friend Vector2 operator+(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x + rhs.x, lhs.y + rhs.y); }
 	friend Vector2 operator-(const Vector2& lhs, const Vector2& rhs) { return Vector2(lhs.x - rhs.x, lhs.y - rhs.y); }
 
+	/* Scalar multiplication */
+	friend Vector2 operator*(const Vector2& vec, float scalar) { return Vector2(vec.x * scalar, vec.y * scalar); }
+	friend Vector2 operator*(float scalar, const Vector2& vec) { return Vector2(scalar * vec.x, scalar * vec.y); }
+
 	/* Vector Length */
 	float LengthSquared() const { return ((x * x) + (y * y)); }
 	float Length() const { return sqrtf(LengthSquared()); }
