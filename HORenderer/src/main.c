@@ -13,8 +13,8 @@ SDL_Renderer* renderer = NULL;
 SDL_Texture* color_buffer_texture = NULL;
 
 uint32_t* color_buffer = NULL;
-const int window_width = 800;
-const int window_height = 600;
+int window_width = 800;
+int window_height = 600;
 
 bool initialize_window(void)
 {
@@ -22,6 +22,13 @@ bool initialize_window(void)
         fprintf(stderr, "Error initializing SDL.\n");
         return false;
     }
+
+    // Use SDL to query what is the fullscreen max. width and height
+    SDL_DisplayMode display_mode;
+    SDL_GetCurrentDisplayMode(0, &display_mode);
+
+    window_width = display_mode.w;
+    window_height = display_mode.h;
 
     // Create a SDL Window
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_BORDERLESS);
@@ -38,6 +45,8 @@ bool initialize_window(void)
         fprintf(stderr, "Error creating SDL renderer.\n");
         return false;
     }
+
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     
     return true;
 }
@@ -111,14 +120,27 @@ void clear_color_buffer(uint32_t color)
     }
 }
 
+void draw_grid(uint32_t color)
+{
+    for (int y = 0; y < window_height; y ++) {
+        for (int x = 0; x < window_width; x++) {
+            if (x % 10 == 0 || y % 10 == 0) {
+                color_buffer[(window_width * y) + x] = color;
+            }
+        }
+    }
+}
+
 void render(void)
 {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    render_color_buffer();
-    clear_color_buffer(0xFFFFFF00);
+    draw_grid(0xFFFFFFFF);
 
+    render_color_buffer();
+    clear_color_buffer(0xFF000000);
+    
     SDL_RenderPresent(renderer);
 }
 
