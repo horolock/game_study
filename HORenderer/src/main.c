@@ -1,4 +1,5 @@
 #include "display.h"
+#include "vector.h"
 
 bool is_running = false;
 
@@ -70,6 +71,8 @@ int main(int argc, char* argv[])
     is_running = initialize_window();
 
     is_running = setup();
+
+    vec3_t my_vector = {2.0, 3.0, -1.0};        // Just for test
 
     while(is_running) {
         process_input();
