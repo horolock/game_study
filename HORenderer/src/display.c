@@ -6,6 +6,7 @@ SDL_Texture* color_buffer_texture = NULL;
 uint32_t* color_buffer = NULL;
 int window_width = 800;
 int window_height = 600;
+float fov_factor = 640.0;
 
 bool initialize_window(void)
 {
@@ -67,6 +68,16 @@ void draw_rectangle(int pos_x, int pos_y, int width, int height, uint32_t color)
             draw_pixel(current_x, current_y, color);
         }
     }
+}
+
+vec2_t project(vec3_t point)
+{
+    vec2_t projected_point = {
+        .x = (fov_factor * point.x) / point.z,
+        .y = (fov_factor * point.y) / point.z
+    };
+
+    return projected_point;
 }
 
 void render_color_buffer(void)
