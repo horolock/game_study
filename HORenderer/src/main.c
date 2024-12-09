@@ -10,6 +10,8 @@ vec3_t cube_rotation = {.x = 0, .y = 0, .z = 0};
 
 bool is_running = false;
 
+int previous_frame_time = 0;
+
 bool setup(void)
 {
     // Allocate the required bytes in memory for the color buffer
@@ -65,7 +67,10 @@ void process_input(void)
 }
 
 void update(void)
-{   
+{
+    while (!SDL_TICKS_PASSED(SDL_GetTicks(), previous_frame_time + FRAME_TARGET_TIME));
+    previous_frame_time = SDL_GetTicks();
+
     cube_rotation.x += 0.01f;
     cube_rotation.y += 0.01f;
     cube_rotation.z += 0.01f;

@@ -8,6 +8,10 @@
 #include <SDL.h>
 #include "vector.h"
 
+#define FPS 30
+// 1000MS (1SEC) / 30
+#define FRAME_TARGET_TIME   (1000 / FPS)     
+
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern SDL_Texture* color_buffer_texture;

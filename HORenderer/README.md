@@ -28,4 +28,4 @@ cos(a) = adjacent / hypotenuse
 tan(a) = opposite / adjacent
 
 
-TODO : Linear Transformations - Rotating Vectors ~ 
+TODO : Linear Transformations - Proof of Angle Sine Addition ~ 
