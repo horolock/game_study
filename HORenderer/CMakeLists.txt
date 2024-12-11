@@ -7,9 +7,11 @@ include_directories("include")
 link_directories("C:/SDL2/lib/x64")
 
 set(SOURCES 
-    src/main.c src/display.c src/vector.c
+    src/main.c src/display.c src/vector.c src/mesh.c src/triangle.c
     include/display.h
     include/vector.h
+    include/mesh.h
+    include/triangle.h
 )
 
 add_executable(${PROJECT_NAME} WIN32
