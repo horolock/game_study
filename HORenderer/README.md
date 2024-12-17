@@ -27,5 +27,8 @@ sin(a) = opposite / hypotenuse
 cos(a) = adjacent / hypotenuse
 tan(a) = opposite / adjacent
 
+### TODO
+
+- File Path 가져오는 방법 알아보기 (현재 절대경로로 적혀있음.)
 
 TODO : Triangles and Vertices - Vertices and Triangle Faces ~ 

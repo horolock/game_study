@@ -36,7 +36,8 @@ bool setup(void)
         return false;
     }
 
-    load_cube_mesh_data();
+    // load_cube_mesh_data();
+    load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
 
     return true;
 }
