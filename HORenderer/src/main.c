@@ -113,6 +113,9 @@ void update(void)
         // Compute the face normal (using the cross product to find perpendicular)
         vec3_t normal = vec3_cross(vector_ab, vector_ac);
 
+        // Normalize the face normal vector
+        vec3_normalize(&normal);
+
         // Find the vector between a point in the triangle and the camera origin
         vec3_t camera_ray = vec3_sub(camera_position, vector_a);
 
