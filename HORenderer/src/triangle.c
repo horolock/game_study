@@ -1,3 +1,4 @@
+#include "display.h"
 #include "triangle.h"
 
 void int_swap(int* a, int* b)
@@ -6,12 +7,38 @@ void int_swap(int* a, int* b)
     *a = *b;
     *b = tmp;
 }
+ 
+/**
+ * Draw a filled a triangle with a flat bottom
+ *              (x0, y0)
+ *                 /\
+ *                /  \
+ *               /    \
+ *              /      \
+ *             /        \
+ *        (x1, y1)------(x2, y2) == (Mx, My)
+ */
+void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) 
+{
+    // Find the two slopes (two triangle legs)
+    float inverseSlope1 = (float)(x1 - x0) / (y1 - y0);
+    float inverseSlope2 = (float)(x2 - x0) / (y2 - y0);
 
-void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+    // Start x_start and x_end from the top vertex(x0, y0)
+    float xStart = x0;
+    float xEnd = x0;
 
+    // Loop all the scanlines from top to bottom
+    for (int y = y0; y <= y2; y++) {
+        draw_line(xStart, y, xEnd, y, color);
+
+        xStart += inverseSlope1;
+        xEnd += inverseSlope2;
+    }
 }
 
-void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) 
+{
 
 }
 
@@ -38,8 +65,8 @@ void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32
     int Mx = ((float)((x2 - x0) * (y1 - y0)) / (float)(y2 - y0)) + x0;
 
     // TODO: Draw flat-bottom triangle
-    fill_flat_bottom_triangle(x0, y0, x1, y1, Mx, My);
+    fill_flat_bottom_triangle(x0, y0, x1, y1, Mx, My, color);
 
     // TODO: Draw flat-top triangle
-    fill_flat_top_triangle(x1, y1, Mx, My, x2, y2);
+    fill_flat_top_triangle(x1, y1, Mx, My, x2, y2, color);
 }
