@@ -166,7 +166,16 @@ void render(void)
                     (int)triangle.points[1].y,
                     (int)triangle.points[2].x,
                     (int)triangle.points[2].y,
-                    0xFF00FF00
+                    0xFFFFFFFF
+        );
+
+        draw_triangle((int)triangle.points[0].x,
+                    (int)triangle.points[0].y,
+                    (int)triangle.points[1].x,
+                    (int)triangle.points[1].y,
+                    (int)triangle.points[2].x,
+                    (int)triangle.points[2].y,
+                    0xFF000000
         );
     }
 
