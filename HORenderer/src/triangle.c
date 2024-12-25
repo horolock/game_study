@@ -37,8 +37,24 @@ void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
     }
 }
 
+
 void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) 
 {
+    // Find the two slopes (two triangle legs)
+    float leftSlope = (float)(x2 - x0) / (y2 - y0);
+    float rightSlope = (float)(x2 - x1) / (y2 - y1);
+
+    // Start x_start and x_end from the bottom vertex(x2, y2)
+    float xStart = x2;
+    float xEnd = x2;
+
+    // Loop all the scanlines from bottom to top
+    for (int y = y2; y >= y0; y--) {
+        draw_line(xStart, y, xEnd, y, color);
+
+        xStart -= leftSlope;
+        xEnd -= rightSlope;
+    }
 
 }
 
