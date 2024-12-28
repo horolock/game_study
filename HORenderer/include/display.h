@@ -8,9 +8,21 @@
 #include <SDL.h>
 #include "vector.h"
 
-#define FPS 30
+#define FPS 60
 // 1000MS (1SEC) / 30
 #define FRAME_TARGET_TIME   (1000 / FPS)     
+
+enum CullMethod {
+    CULL_NONE,
+    CULL_BACKFACE
+} CullMethod;
+
+enum RenderMethod {
+    RENDER_WIRE,
+    RENDER_WIRE_VERTEX,
+    RENDER_FILL_TRIANGLE,
+    RENDER_FILL_TRIANGLE_WIRE
+} RenderMethod;
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
