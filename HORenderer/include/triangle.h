@@ -14,6 +14,7 @@ typedef struct {
 typedef struct {
     vec2_t points[3];
     uint32_t color;
+    float avgDepth;
 } triangle_t;
 
 void draw_rectangle(int pos_x, int pos_y, int width, int height, uint32_t color);
