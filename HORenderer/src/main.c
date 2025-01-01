@@ -112,9 +112,11 @@ void update(void)
     mesh.rotation.z += 0.01f;
     mesh.scale.x += 0.002f;
     mesh.scale.y += 0.001f;
+    mesh.translation.x += 0.01f;
 
     // Create a scale matrix that will be used to multiply the mesh vertices
     mat4_t scaleMatrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+    mat4_t translationMatrix = mat4_make_translation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
 
     int num_faces = array_length(mesh.faces);
 
