@@ -110,9 +110,10 @@ void update(void)
     mesh.rotation.x += 0.01f;
     mesh.rotation.y += 0.01f;
     mesh.rotation.z += 0.01f;
-    mesh.scale.x += 0.002f;
-    mesh.scale.y += 0.001f;
+    // mesh.scale.x += 0.002f;
+    // mesh.scale.y += 0.001f;
     mesh.translation.x += 0.01f;
+    mesh.translation.z = 5.0f;
 
     // Create a scale matrix that will be used to multiply the mesh vertices
     mat4_t scaleMatrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -135,11 +136,9 @@ void update(void)
 
             // Use a matrix to scale our original vertex
 
-            // Multiply the scaleMatrix by the vertex
+            // Scale and Translation Cube.
             transformed_vertex = mat4_multiply_vec4(scaleMatrix, transformed_vertex);
-
-            // Translate the vertex away from the camera
-            transformed_vertex.z += 5;
+            transformed_vertex = mat4_multiply_vec4(translationMatrix, transformed_vertex);
 
             // Save transformed vertex in the array of transformed vertices
             transformed_vertices[j] = transformed_vertex;
