@@ -112,12 +112,15 @@ void update(void)
     mesh.rotation.z += 0.01f;
     // mesh.scale.x += 0.002f;
     // mesh.scale.y += 0.001f;
-    mesh.translation.x += 0.01f;
+    // mesh.translation.x += 0.01f;
     mesh.translation.z = 5.0f;
 
-    // Create a scale matrix that will be used to multiply the mesh vertices
+    // Create a scale, rotation and translation matrix that will be used to multiply the mesh vertices
     mat4_t scaleMatrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translationMatrix = mat4_make_translation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
+    mat4_t rotationMatrixX = mat4_make_rotation_x(mesh.rotation.x);
+    mat4_t rotationMatrixY = mat4_make_rotation_y(mesh.rotation.y);
+    mat4_t rotationMatrixZ = mat4_make_rotation_z(mesh.rotation.z);
 
     int num_faces = array_length(mesh.faces);
 
@@ -138,8 +141,11 @@ void update(void)
 
             // Scale and Translation Cube.
             transformed_vertex = mat4_multiply_vec4(scaleMatrix, transformed_vertex);
+            transformed_vertex = mat4_multiply_vec4(rotationMatrixX, transformed_vertex);
+            transformed_vertex = mat4_multiply_vec4(rotationMatrixY, transformed_vertex);
+            transformed_vertex = mat4_multiply_vec4(rotationMatrixZ, transformed_vertex);
             transformed_vertex = mat4_multiply_vec4(translationMatrix, transformed_vertex);
-
+            
             // Save transformed vertex in the array of transformed vertices
             transformed_vertices[j] = transformed_vertex;
         }
