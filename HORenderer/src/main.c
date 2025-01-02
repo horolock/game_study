@@ -110,9 +110,9 @@ void update(void)
     mesh.rotation.x += 0.01f;
     mesh.rotation.y += 0.01f;
     mesh.rotation.z += 0.01f;
-    // mesh.scale.x += 0.002f;
-    // mesh.scale.y += 0.001f;
-    // mesh.translation.x += 0.01f;
+    mesh.scale.x += 0.002f;
+    mesh.scale.y += 0.001f;
+    mesh.translation.x += 0.01f;
     mesh.translation.z = 5.0f;
 
     // Create a scale, rotation and translation matrix that will be used to multiply the mesh vertices
@@ -139,13 +139,18 @@ void update(void)
 
             // Use a matrix to scale our original vertex
 
-            // Scale and Translation Cube.
-            transformed_vertex = mat4_multiply_vec4(scaleMatrix, transformed_vertex);
-            transformed_vertex = mat4_multiply_vec4(rotationMatrixX, transformed_vertex);
-            transformed_vertex = mat4_multiply_vec4(rotationMatrixY, transformed_vertex);
-            transformed_vertex = mat4_multiply_vec4(rotationMatrixZ, transformed_vertex);
-            transformed_vertex = mat4_multiply_vec4(translationMatrix, transformed_vertex);
-            
+            // Create a World Matrix combining scale, rotation, and translation matrices
+            mat4_t worldMatrix = mat4_identity();
+
+            worldMatrix = mat4_multiply_mat4(scaleMatrix, worldMatrix);
+            worldMatrix = mat4_multiply_mat4(rotationMatrixZ, worldMatrix);
+            worldMatrix = mat4_multiply_mat4(rotationMatrixY, worldMatrix);
+            worldMatrix = mat4_multiply_mat4(rotationMatrixX, worldMatrix);
+            worldMatrix = mat4_multiply_mat4(translationMatrix, worldMatrix);
+
+            // Multiply the world matrix by the original 
+            transformed_vertex = mat4_multiply_vec4(worldMatrix, transformed_vertex);
+
             // Save transformed vertex in the array of transformed vertices
             transformed_vertices[j] = transformed_vertex;
         }
