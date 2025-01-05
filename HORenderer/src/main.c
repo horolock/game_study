@@ -13,6 +13,8 @@ bool is_running = false;
 
 int previous_frame_time = 0;
 
+mat4_t projectionMatrix;
+
 bool setup(void)
 {
     // Initialize render mode and triangle culling method.
@@ -40,6 +42,13 @@ bool setup(void)
         fprintf(stderr, "Error creating SDL Texture.\n");
         return false;
     }
+
+    /* Initialize the perspective projection matrix */
+    float fov = M_PI / 3.0;
+    float aspect = ((float)window_height / (float)window_width);
+    float znear = 0.1;
+    float zfar = 100.0;
+    projectionMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
     load_cube_mesh_data();
     // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
@@ -108,11 +117,11 @@ void update(void)
 
     // Change the mesh scale/rotation values per animation frame
     mesh.rotation.x += 0.01f;
-    mesh.rotation.y += 0.01f;
-    mesh.rotation.z += 0.01f;
-    mesh.scale.x += 0.002f;
-    mesh.scale.y += 0.001f;
-    mesh.translation.x += 0.01f;
+    // mesh.rotation.y += 0.01f;
+    // mesh.rotation.z += 0.01f;
+    // mesh.scale.x += 0.002f;
+    // mesh.scale.y += 0.001f;
+    // mesh.translation.x += 0.01f;
     mesh.translation.z = 5.0f;
 
     // Create a scale, rotation and translation matrix that will be used to multiply the mesh vertices
@@ -184,16 +193,20 @@ void update(void)
             }
         }
         
-        vec2_t projected_points[3];
+        vec4_t projected_points[3];
 
         // Loop all three vertices to perform projection
         for (int j = 0; j < 3; j++) {
             // Project the current vertex
-            projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
+            projected_points[j] = mat4_multiply_vec4_project(projectionMatrix, transformed_vertices[j]);
 
-            // Scale and translate the projected points to the middle of the screen
-            projected_points[j].x += (window_width / 2);
-            projected_points[j].y += (window_height / 2);
+            // Scale into the view 
+            projected_points[j].x *= (window_width / 2.0);
+            projected_points[j].y *= (window_height / 2.0);
+
+            // Translate the projected points to the middle of the screen
+            projected_points[j].x += (window_width / 2.0);
+            projected_points[j].y += (window_height / 2.0);
         }
 
         // Calculate the average depth for each face based on the vertices after transformation
