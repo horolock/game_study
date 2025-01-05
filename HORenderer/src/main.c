@@ -137,11 +137,11 @@ void update(void)
         for (int j = 0; j < 3; j++) {
             vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 
-            // Use a matrix to scale our original vertex
-
             // Create a World Matrix combining scale, rotation, and translation matrices
             mat4_t worldMatrix = mat4_identity();
 
+            // Order matters : First scale, then rotate, the translate. 
+            // [T] * [R] * [S] * v
             worldMatrix = mat4_multiply_mat4(scaleMatrix, worldMatrix);
             worldMatrix = mat4_multiply_mat4(rotationMatrixZ, worldMatrix);
             worldMatrix = mat4_multiply_mat4(rotationMatrixY, worldMatrix);
