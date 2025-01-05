@@ -51,7 +51,7 @@ bool setup(void)
     projectionMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
     load_cube_mesh_data();
-    // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
+    // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.obj");
 
     return true;
 }
