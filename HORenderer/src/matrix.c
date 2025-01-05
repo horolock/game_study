@@ -120,10 +120,10 @@ mat4_t mat4_make_rotation_z(float angle)
 mat4_t mat4_make_perspective(float fov, float aspect, float znear, float zfar)
 {
     /**
-     * (h/w) * (1 / tan(fov/2))   0                         0                                   0
-     *          0           (1 / tan(fov/2))                0                                   0
-     *          0                 0    (zfar/(zfar-znear) - (zfar * znear) / (zfar - znear))    0
-     *          0                 0                         1                                   0
+     * (h/w) * (1 / tan(fov/2))   0                         0                           0
+     *          0           (1 / tan(fov/2))                0                           0
+     *          0                 0                 (zfar/(zfar-znear)     (zfar * znear) / (zfar - znear))
+     *          0                 0                         1                           0
      *                                                      |
      *                                                      -> we'll save the original unchanged 'z' value inside 'w'
      */
@@ -131,7 +131,8 @@ mat4_t mat4_make_perspective(float fov, float aspect, float znear, float zfar)
 
     projectionMatrix.m[0][0] = aspect * (1 / (tan(fov/2)));
     projectionMatrix.m[1][1] = (1 / (tan(fov/2)));
-    projectionMatrix.m[2][2] = ((zfar / (zfar - znear)) - (zfar * znear) / (zfar - znear));
+    projectionMatrix.m[2][2] = (zfar / (zfar - znear));
+    projectionMatrix.m[2][3] = (-zfar * znear) / (zfar - znear);
     projectionMatrix.m[3][2] = 1.0; // This '1' is for saving original 'z' value in 'w'
 
     return projectionMatrix;

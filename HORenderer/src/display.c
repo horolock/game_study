@@ -92,16 +92,6 @@ void draw_line(int x0, int y0, int x1, int y1, uint32_t color)
     }
 }
 
-vec2_t project(vec3_t point)
-{
-    vec2_t projected_point = {
-        .x = (fov_factor * point.x) / point.z,
-        .y = (fov_factor * point.y) / point.z
-    };
-
-    return projected_point;
-}
-
 void render_color_buffer(void)
 {
     SDL_UpdateTexture(
