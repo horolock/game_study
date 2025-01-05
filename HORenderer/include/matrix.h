@@ -21,5 +21,6 @@ mat4_t mat4_make_perspective(float fov, float aspect, float znear, float zfar);
 
 vec4_t mat4_multiply_vec4(mat4_t m, vec4_t v);
 mat4_t mat4_multiply_mat4(mat4_t a, mat4_t b);
+vec4_t mat4_multiply_vec4_project(mat4_t projectionMatrix, vec4_t v);
 
 #endif /* MATRIX_H */

@@ -161,3 +161,21 @@ mat4_t mat4_multiply_mat4(mat4_t a, mat4_t b)
 
     return result;
 }
+
+vec4_t mat4_multiply_vec4_project(mat4_t projectionMatrix, vec4_t v)
+{
+    /* Multiplication by the Projection Matrix */
+    vec4_t result = mat4_multiply_vec4(projectionMatrix, v);
+
+    /**
+     * Perspective Divide
+     * Perform perspective divide with original z-value that is now stored in w
+     */
+    if (result.w != 0.0) {
+        result.x /= result.w;
+        result.y /= result.w;
+        result.z /= result.w;
+    }
+
+    return result;
+}
