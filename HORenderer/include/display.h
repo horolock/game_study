@@ -41,9 +41,4 @@ void render_color_buffer(void);
 void clear_color_buffer(uint32_t color);
 void destroy_window(void);
 
-/**
- * Lighting
- */
-uint32_t light_apply_intensity(uint32_t original_color, float percentage_factor);
-
 #endif  /* DISPLAY_H */

@@ -14,6 +14,7 @@ set(C_SOURCES
     src/triangle.c
     src/array.c
     src/matrix.c
+    src/light.c
 )
 
 set (HEADER_FILES 
@@ -23,6 +24,7 @@ set (HEADER_FILES
     include/triangle.h
     include/vector.h
     include/matrix.h
+    include/light.h
 )
 
 add_executable(${PROJECT_NAME} WIN32
