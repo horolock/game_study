@@ -91,6 +91,14 @@ void process_input(void)
             {
                 RenderMethod = RENDER_FILL_TRIANGLE_WIRE;
             }
+            if (event.key.keysym.sym == SDLK_5)
+            {
+                RenderMethod = RENDER_TEXTURED;
+            }
+            if (event.key.keysym.sym == SDLK_6)
+            {
+                RenderMethod = RENDER_TEXTURED_WIRE;
+            }
             if (event.key.keysym.sym == SDLK_c)
             {
                 CullMethod = CULL_BACKFACE;
@@ -99,6 +107,7 @@ void process_input(void)
             {
                 CullMethod = CULL_NONE;
             }
+            
             break;
     }
 }
@@ -263,8 +272,13 @@ void render(void)
                 triangle.color);
         }
 
+        // Draw textured triangle
+        if (RenderMethod == RENDER_TEXTURED || RenderMethod == RENDER_TEXTURED_WIRE) {
+            // TODO: draw_textured_triangle ( ... )
+        }
+
         // Draw triangle wireframe
-        if (RenderMethod == RENDER_WIRE || RenderMethod == RENDER_WIRE_VERTEX || RenderMethod == RENDER_FILL_TRIANGLE_WIRE) {
+        if (RenderMethod == RENDER_WIRE || RenderMethod == RENDER_WIRE_VERTEX || RenderMethod == RENDER_FILL_TRIANGLE_WIRE || RenderMethod == RENDER_TEXTURED_WIRE) {
             draw_triangle(
                 (int)triangle.points[0].x, (int)triangle.points[0].y,
                 (int)triangle.points[1].x, (int)triangle.points[1].y,
