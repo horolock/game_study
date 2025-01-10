@@ -3,6 +3,8 @@
 #include "vector.h"
 #include "mesh.h"
 #include "light.h"
+#include "triangle.h"
+#include "texture.h"
 #include "matrix.h"
 
 triangle_t* triangles_to_render = NULL;
@@ -51,8 +53,13 @@ bool setup(void)
     float zfar = 100.0;
     projectionMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-    // load_cube_mesh_data();
-    load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
+    // Manually load the hardcoded texture data from the static array
+    mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
+    texture_width = 64;
+    texture_height = 64;
+
+    load_cube_mesh_data();
+    // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
 
     return true;
 }
@@ -233,6 +240,11 @@ void update(void)
                 projected_points[1].x, projected_points[1].y,
                 projected_points[2].x, projected_points[2].y,
             },
+            .texcoords = {
+                { mesh_face.a_uv.u, mesh_face.a_uv.v },
+                { mesh_face.b_uv.u, mesh_face.b_uv.v },
+                { mesh_face.c_uv.u, mesh_face.c_uv.v }
+            },
             .color = triangle_color,
             .avgDepth = avgDepth
         };
@@ -275,6 +287,8 @@ void render(void)
         // Draw textured triangle
         if (RenderMethod == RENDER_TEXTURED || RenderMethod == RENDER_TEXTURED_WIRE) {
             // TODO: draw_textured_triangle ( ... )
+
+            // triangle.points[0].x, triangle.points[0].y, triangle.texcoords[0].u, triangle.texcoords[0].v
         }
 
         // Draw triangle wireframe
