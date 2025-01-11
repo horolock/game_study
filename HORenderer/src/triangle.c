@@ -1,13 +1,7 @@
 #include "display.h"
 #include "triangle.h"
+#include "swap.h"
 
-void int_swap(int* a, int* b)
-{
-    int tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
- 
 /**
  * Draw a filled a triangle with a flat bottom
  *              (x0, y0)
@@ -116,6 +110,77 @@ void draw_textured_triangle(
     int x2, int y2, float u2, float v2,
     uint32_t* texture
 ) {
-    // Loop all the pixels of the triangle to render them based on the color 
-    // that comes from the texture
+    /**
+     * We need to sort the vertices by y-coordinate ascending (y0 < y1 < y2)
+     */
+    if (y0 > y1) {
+        int_swap(&y0, &y1);
+        int_swap(&x0, &x1);
+        float_swap(&u0, &u1);
+        float_swap(&v0, &v1);
+    }
+    if (y1 > y2) {
+        int_swap(&y1, &y2);
+        int_swap(&x1, &x2);
+        float_swap(&u1, &u2);
+        float_swap(&v1, &v2);
+    }
+    if (y0 > y1) {
+        int_swap(&y0, &y1);
+        int_swap(&x0, &x1);
+        float_swap(&u0, &u1);
+        float_swap(&v0, &v1);
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Render the upper part of the triangle (Flat-bottom)
+     * ---------------------------------------------------
+     */
+    float inv_slope_1 = 0;
+    float inv_slope_2 = 0;
+
+    if (y1 - y0 != 0) {inv_slope_1 = (float)(x1 - x0) / abs(y1 - y0);}
+    if (y2 - y0 != 0) {inv_slope_2 = (float)(x2 - x0) / abs(y2 - y0);}
+
+    if (y1 - y0 != 0) {
+        for (int y = y0; y <= y1; y++) {
+            int x_start = x1 + (y - y1) * inv_slope_1;
+            int x_end = x0 + (y - y0) * inv_slope_2;
+
+            /* Swap if x_start is the right of x_end */
+            if (x_end < x_start) { int_swap(&x_start, &x_end); }
+
+            for (int x = x_start; x < x_end; x++) {
+                // Draw our pixel with the color that comes from the texture
+                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+            }
+        }
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Render the bottom part of the triangle (Flat-top)
+     * ---------------------------------------------------
+     */
+    inv_slope_1 = 0;
+    inv_slope_2 = 0;
+
+    if (y2 - y1 != 0) { inv_slope_1 = (float)(x2 - x1) / abs(y2 - y1); }
+    if (y2 - y0 != 0) { inv_slope_2 = (float)(x2 - x0) / abs(y2 - y0); }
+
+    if (y2 - y1 != 0) {
+        for (int y = y1; y <= y2; y++) {
+            int x_start = x1 + (y - y1) * inv_slope_1;
+            int x_end = x0 + (y - y0) * inv_slope_2;
+
+            if (x_end < x_start) {
+                int_swap(&x_start, &x_end);
+            }
+
+            for (int x = x_start; x < x_end; x++) {
+                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+            }
+        }
+    }
 }

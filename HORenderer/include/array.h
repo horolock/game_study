@@ -1,6 +1,15 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+/**
+ * 
+ * array.h is for Dynamic array.
+ * 
+ */
+
+/**
+ * @brief push value in array macro
+ */
 #define array_push(array, value)                                        \
             do {                                                        \
                 (array) = array_hold((array), 1, sizeof(*(array)));     \

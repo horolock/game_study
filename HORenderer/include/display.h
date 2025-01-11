@@ -13,19 +13,22 @@
 #define FRAME_TARGET_TIME   (1000 / FPS)     
 
 enum CullMethod {
-    CULL_NONE,
-    CULL_BACKFACE
+    CULL_NONE,          /* Disable Backface-Culling */
+    CULL_BACKFACE       /* Enable Backface-Culling */
 } CullMethod;
 
 enum RenderMethod {
-    RENDER_WIRE,
-    RENDER_WIRE_VERTEX,
-    RENDER_FILL_TRIANGLE,
-    RENDER_FILL_TRIANGLE_WIRE,
+    RENDER_WIRE,                /* Enable Wireframe */
+    RENDER_WIRE_VERTEX,         /* Display Wireframe with Vertex */
+    RENDER_FILL_TRIANGLE,       /* Fill triangle with color */
+    RENDER_FILL_TRIANGLE_WIRE,  /* Fill triangle with color and display wireframe */
     RENDER_TEXTURED,
     RENDER_TEXTURED_WIRE
 } RenderMethod;
 
+/**
+ * SDL variables
+ */
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern SDL_Texture* color_buffer_texture;
@@ -34,6 +37,9 @@ extern uint32_t* color_buffer;
 extern int window_width;
 extern int window_height;
 
+/**
+ * Methods prototypes for display
+ */
 bool initialize_window(void);
 void draw_grid(uint32_t color);
 void draw_pixel(int x, int y, uint32_t color);

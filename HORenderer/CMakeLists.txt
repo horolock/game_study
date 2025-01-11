@@ -15,6 +15,8 @@ set(C_SOURCES
     src/array.c
     src/matrix.c
     src/light.c
+    src/texture.c
+    src/swap.c
 )
 
 set (HEADER_FILES 
@@ -25,6 +27,8 @@ set (HEADER_FILES
     include/vector.h
     include/matrix.h
     include/light.h
+    include/texture.h
+    include/swap.h
 )
 
 add_executable(${PROJECT_NAME} WIN32
