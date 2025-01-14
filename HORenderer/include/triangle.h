@@ -31,4 +31,6 @@ void draw_textured_triangle(
     uint32_t* texture
 );
 
+vec3_t barycentric_weights(vec2_t a, vec2_t b, vec2_t c, vec2_t p);
+
 #endif /* TRIANGLE_H */
