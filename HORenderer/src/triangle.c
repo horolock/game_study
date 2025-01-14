@@ -187,5 +187,41 @@ void draw_textured_triangle(
 
 vec3_t barycentric_weights(vec2_t a, vec2_t b, vec2_t c, vec2_t p)
 {
-    
+    vec2_t ac = vec2_sub(c, a);
+    vec2_t ab = vec2_sub(b, a);
+    vec2_t pc = vec2_sub(c, p);
+    vec2_t pb = vec2_sub(b, p);
+    vec2_t ap = vec2_sub(p, a);
+
+    /**
+     * Area of the full paralleleogram (triangle ABC) using cross product
+     * | ac.x | \/ | ab.x |
+     * | ac.y | /\ | ab.y |
+     * ac.x * ab.y - ac.y * ab.x
+     */
+    // TODO: implementation
+    float area_parallelogram_abc = 0.0;
+
+    /**
+     * Alpha = area of parallelogram PBC over the area of the full parallelogram ABC
+     * || PC x PB ||
+     * -------------
+     * || AC x AB ||
+     * 
+     * Beta = area of parallelogram APC over the area of the full parallelogram ABC
+     * || AC x AP ||
+     * -------------
+     * || AC x AB ||
+     * 
+     * Gamma can be easily found since barycentric coordinates alwasy add up to 1.0
+     * gamma = 1.0 - alpha - beta
+     */
+    // TODO: implementation
+    float alpha = 0.0;
+    float beta = 0.0;
+    float gamma = 0.0;
+
+    vec3_t weights = {alpha, beta, gamma};
+
+    return weights;
 }
