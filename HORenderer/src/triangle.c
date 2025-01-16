@@ -70,6 +70,29 @@ void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t colo
     draw_line(x2, y2, x0, y0, color);
 }
 
+/**
+ * Function to draw the textured pixel at position x and y using interpolation
+ */
+void draw_texel(int x, int y, uint32_t* texture, vec2_t point_a, vec2_t point_b, vec2_t point_c, float u0, float v0, float u1, float v1, float u2, float v2)
+{
+    vec2_t point_p = {x, y};
+    vec3_t weights = barycentric_weights(point_a, point_b, point_c, point_p);
+
+    float alpha = weights.x;
+    float beta = weights.y;
+    float gamma = weights.z;
+    
+    float interpolated_u = (u0) * alpha + (u1) * beta + (u2) * gamma;
+    float interpolated_v = (v0) * alpha + (v1) * beta + (v2) * gamma;
+
+    int tex_x = abs((int)(interpolated_u * texture_width));
+    int tex_y = abs((int)(interpolated_v * texture_height));
+
+    if (tex_x >= 0 && tex_x <= texture_width && tex_y >= 0 && tex_y <= texture_height) {
+        draw_pixel(x, y, texture[(texture_width * tex_y) + tex_x]);
+    }
+}
+
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
 {
     // We need to start the vertices by y-coordinate ascending (y0 < y1 < y2)
@@ -133,6 +156,13 @@ void draw_textured_triangle(
     }
 
     /**
+     * Create vector points after we sort the vertices
+     */
+    vec2_t point_a = {x0, y0};
+    vec2_t point_b = {x1, y1};
+    vec2_t point_c = {x2, y2};
+
+    /**
      * ---------------------------------------------------
      * Render the upper part of the triangle (Flat-bottom)
      * ---------------------------------------------------
@@ -153,7 +183,7 @@ void draw_textured_triangle(
 
             for (int x = x_start; x < x_end; x++) {
                 // Draw our pixel with the color that comes from the texture
-                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+                draw_texel(x, y, texture, point_a, point_b, point_c, u0, v0, u1, v1, u2, v2);
             }
         }
     }
@@ -179,7 +209,7 @@ void draw_textured_triangle(
             }
 
             for (int x = x_start; x < x_end; x++) {
-                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+                draw_texel(x, y, texture, point_a, point_b, point_c, u0, v0, u1, v1, u2, v2);
             }
         }
     }
@@ -199,8 +229,7 @@ vec3_t barycentric_weights(vec2_t a, vec2_t b, vec2_t c, vec2_t p)
      * | ac.y | /\ | ab.y |
      * ac.x * ab.y - ac.y * ab.x
      */
-    // TODO: implementation
-    float area_parallelogram_abc = 0.0;
+    float area_parallelogram_abc = (ac.x * ab.y) - (ac.y * ab.x);
 
     /**
      * Alpha = area of parallelogram PBC over the area of the full parallelogram ABC
@@ -216,10 +245,9 @@ vec3_t barycentric_weights(vec2_t a, vec2_t b, vec2_t c, vec2_t p)
      * Gamma can be easily found since barycentric coordinates alwasy add up to 1.0
      * gamma = 1.0 - alpha - beta
      */
-    // TODO: implementation
-    float alpha = 0.0;
-    float beta = 0.0;
-    float gamma = 0.0;
+    float alpha = ((pc.x * pb.y) - (pc.y * pb.x)) / area_parallelogram_abc;
+    float beta = ((ac.x * ap.y) - (ac.y * ap.x)) / area_parallelogram_abc;
+    float gamma = 1.0 - alpha - beta;
 
     vec3_t weights = {alpha, beta, gamma};
 
