@@ -85,10 +85,31 @@ void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b,
     float alpha = weights.x;
     float beta = weights.y;
     float gamma = weights.z;
-    
-    float interpolated_u = (u0) * alpha + (u1) * beta + (u2) * gamma;
-    float interpolated_v = (v0) * alpha + (v1) * beta + (v2) * gamma;
 
+    /**
+     * Variables to store the interpolated values of U, V, and also 1/W for the current pixel
+     */
+    float interpolated_u;
+    float interpolated_v;
+    float interpolated_reciprocal_w;
+    
+    interpolated_u = (u0 / point_a.w) * alpha + (u1 / point_b.w) * beta + (u2 / point_c.w) * gamma;
+    interpolated_v = (v0 / point_a.w) * alpha + (v1 / point_b.w) * beta + (v2 / point_c.w) * gamma;
+
+    /**
+     * Also interpolate the valuue of 1/W for the current pixel
+     */
+    interpolated_reciprocal_w = (1 / point_a.w) * alpha + (1 / point_b.w) * beta + (1 / point_c.w) * gamma;
+
+    /**
+     * Now we can divide back both interpolated values by 1/W
+     */
+    interpolated_u /= interpolated_reciprocal_w;
+    interpolated_v /= interpolated_reciprocal_w;
+
+    /**
+     * Map the UV coordinate to the full texture width and height
+     */
     int tex_x = abs((int)(interpolated_u * texture_width));
     int tex_y = abs((int)(interpolated_v * texture_height));
 
