@@ -73,7 +73,7 @@ void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t colo
 /**
  * Function to draw the textured pixel at position x and y using interpolation
  */
-void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b, vec4_t point_c, float u0, float v0, float u1, float v1, float u2, float v2)
+void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b, vec4_t point_c, tex2_t a_uv, tex2_t b_uv, tex2_t c_uv)
 {
     vec2_t p = {x, y};
     vec2_t a = vec2_from_vec4(point_a);
@@ -93,8 +93,8 @@ void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b,
     float interpolated_v;
     float interpolated_reciprocal_w;
     
-    interpolated_u = (u0 / point_a.w) * alpha + (u1 / point_b.w) * beta + (u2 / point_c.w) * gamma;
-    interpolated_v = (v0 / point_a.w) * alpha + (v1 / point_b.w) * beta + (v2 / point_c.w) * gamma;
+    interpolated_u = (a_uv.u / point_a.w) * alpha + (b_uv.u / point_b.w) * beta + (c_uv.u / point_c.w) * gamma;
+    interpolated_v = (a_uv.v / point_a.w) * alpha + (b_uv.v / point_b.w) * beta + (c_uv.v / point_c.w) * gamma;
 
     /**
      * Also interpolate the valuue of 1/W for the current pixel
@@ -193,6 +193,10 @@ void draw_textured_triangle(
     vec4_t point_b = {x1, y1, z1, w1};
     vec4_t point_c = {x2, y2, z2, w2};
 
+    tex2_t a_uv = {u0, v0};
+    tex2_t b_uv = {u1, v1};
+    tex2_t c_uv = {u2, v2};
+
     /**
      * ---------------------------------------------------
      * Render the upper part of the triangle (Flat-bottom)
@@ -214,7 +218,7 @@ void draw_textured_triangle(
 
             for (int x = x_start; x < x_end; x++) {
                 // Draw our pixel with the color that comes from the texture
-                draw_texel(x, y, texture, point_a, point_b, point_c, u0, v0, u1, v1, u2, v2);
+                draw_texel(x, y, texture, point_a, point_b, point_c, a_uv, b_uv, c_uv);
             }
         }
     }
@@ -240,7 +244,7 @@ void draw_textured_triangle(
             }
 
             for (int x = x_start; x < x_end; x++) {
-                draw_texel(x, y, texture, point_a, point_b, point_c, u0, v0, u1, v1, u2, v2);
+                draw_texel(x, y, texture, point_a, point_b, point_c, a_uv, b_uv, c_uv);
             }
         }
     }
