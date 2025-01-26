@@ -17,6 +17,7 @@ set(C_SOURCES
     src/light.c
     src/texture.c
     src/swap.c
+    src/upng.c
 )
 
 set (HEADER_FILES 
@@ -29,6 +30,7 @@ set (HEADER_FILES
     include/light.h
     include/texture.h
     include/swap.h
+    include/upng.h
 )
 
 add_executable(${PROJECT_NAME} WIN32
