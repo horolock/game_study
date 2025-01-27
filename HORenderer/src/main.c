@@ -6,6 +6,7 @@
 #include "triangle.h"
 #include "texture.h"
 #include "matrix.h"
+#include "upng.h"
 
 triangle_t* triangles_to_render = NULL;
 
@@ -54,12 +55,15 @@ bool setup(void)
     projectionMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
     // Manually load the hardcoded texture data from the static array
-    mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
-    texture_width = 64;
-    texture_height = 64;
+    // mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
+    // texture_width = 64;
+    // texture_height = 64;
 
     load_cube_mesh_data();
     // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
+
+    /* Load the texture information from an external PNG file */
+    load_png_texture_data("./assets/cube.png");
 
     return true;
 }
