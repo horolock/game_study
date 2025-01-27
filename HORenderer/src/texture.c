@@ -4,7 +4,7 @@
 int texture_width = 64;
 int texture_height = 64;
 
-upng_t* mesh_texture = NULL;
+upng_t* png_texture = NULL;
 uint32_t* mesh_texture = NULL;
 
 void load_png_texture_data(char* filename)

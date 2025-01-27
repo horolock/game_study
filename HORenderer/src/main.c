@@ -36,7 +36,7 @@ bool setup(void)
 
     color_buffer_texture = SDL_CreateTexture(
         renderer,
-        SDL_PIXELFORMAT_ARGB8888,
+        SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STREAMING,
         window_width,
         window_height
@@ -63,7 +63,7 @@ bool setup(void)
     // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
 
     /* Load the texture information from an external PNG file */
-    load_png_texture_data("./assets/cube.png");
+    load_png_texture_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.png");
 
     return true;
 }
