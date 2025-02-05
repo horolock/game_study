@@ -58,9 +58,8 @@ bool setup(void)
     // mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
     // texture_width = 64;
     // texture_height = 64;
-
-    load_cube_mesh_data();
-    // load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
+    // load_cube_mesh_data();
+    load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.obj");
 
     /* Load the texture information from an external PNG file */
     load_png_texture_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.png");
@@ -137,9 +136,9 @@ void update(void)
     triangles_to_render = NULL;
 
     // Change the mesh scale/rotation values per animation frame
-    mesh.rotation.x += 0.01f;
+    // mesh.rotation.x += 0.01f;
     mesh.rotation.y += 0.01f;
-    mesh.rotation.z += 0.01f;
+    // mesh.rotation.z += 0.01f;
     mesh.translation.z = 5.0f;
 
     // Create a scale, rotation and translation matrix that will be used to multiply the mesh vertices
@@ -154,9 +153,9 @@ void update(void)
     for (int i = 0; i < num_faces; i++) {
         face_t mesh_face = mesh.faces[i];
         vec3_t face_vertices[3];
-        face_vertices[0] = mesh.vertices[mesh_face.a - 1];
-        face_vertices[1] = mesh.vertices[mesh_face.b - 1];
-        face_vertices[2] = mesh.vertices[mesh_face.c - 1];
+        face_vertices[0] = mesh.vertices[mesh_face.a];
+        face_vertices[1] = mesh.vertices[mesh_face.b];
+        face_vertices[2] = mesh.vertices[mesh_face.c];
 
         vec4_t transformed_vertices[3];
 
