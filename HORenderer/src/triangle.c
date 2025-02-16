@@ -110,12 +110,10 @@ void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b,
     /**
      * Map the UV coordinate to the full texture width and height
      */
-    int tex_x = abs((int)(interpolated_u * texture_width));
-    int tex_y = abs((int)(interpolated_v * texture_height));
-
-    if (tex_x >= 0 && tex_x <= texture_width && tex_y >= 0 && tex_y <= texture_height) {
-        draw_pixel(x, y, texture[(texture_width * tex_y) + tex_x]);
-    }
+    int tex_x = abs((int)(interpolated_u * texture_width)) % texture_width;
+    int tex_y = abs((int)(interpolated_v * texture_height)) % texture_height;
+    
+    draw_pixel(x, y, texture[(texture_width * tex_y) + tex_x]);
 }
 
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
