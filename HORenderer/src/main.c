@@ -25,8 +25,9 @@ bool setup(void)
     RenderMethod = RENDER_WIRE;
     CullMethod = CULL_BACKFACE;
 
-    // Allocate the required bytes in memory for the color buffer
+    // Allocate the required bytes in memory for the color buffer and the z-buffer
     color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);   
+    z_buffer = (float*)malloc(sizeof(float) * window_width * window_height);
 
     // Check color buffer successfully allocated
     if (!color_buffer) {
@@ -59,10 +60,10 @@ bool setup(void)
     // texture_width = 64;
     // texture_height = 64;
     // load_cube_mesh_data();
-    load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.obj");
+    load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
 
     /* Load the texture information from an external PNG file */
-    load_png_texture_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/cube.png");
+    load_png_texture_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.png");
 
     return true;
 }
@@ -320,6 +321,7 @@ void render(void)
     render_color_buffer();
 
     clear_color_buffer(0xFF000000);
+    clear_z_buffer();
     
     SDL_RenderPresent(renderer);
 }
@@ -327,6 +329,7 @@ void render(void)
 void free_resources(void)
 {
     free(color_buffer);
+    free(z_buffer);
     upng_free(png_texture);
     array_free(mesh.vertices);
     array_free(mesh.faces);

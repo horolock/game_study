@@ -112,8 +112,20 @@ void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b,
      */
     int tex_x = abs((int)(interpolated_u * texture_width)) % texture_width;
     int tex_y = abs((int)(interpolated_v * texture_height)) % texture_height;
-    
-    draw_pixel(x, y, texture[(texture_width * tex_y) + tex_x]);
+
+    /* Adjust 1/w so the pixels that are closer to the camera have smaller values */
+    interpolated_reciprocal_w = 1.0 - interpolated_reciprocal_w;
+
+    /**
+     * Only draw the pixel if the depth value is less than the one previously stored in z-buffer
+     */
+    if (interpolated_reciprocal_w < z_buffer[(window_width * y) + x]) {
+        /* Draw a pixel at (x,y) with the color that comes from the mapped texture */
+        draw_pixel(x, y, texture[(texture_width * tex_y) + tex_x]);
+
+        /* Update the z-buffer value with the 1/w of this current pixel*/
+        z_buffer[(window_width * y) + x] = interpolated_reciprocal_w;
+    }
 }
 
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
