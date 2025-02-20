@@ -8,16 +8,25 @@
 #include "matrix.h"
 #include "upng.h"
 
-triangle_t* triangles_to_render = NULL;
+/**
+ * Global variables for execution status and game loop
+ */
+bool isRunning = false;
+int previousFrameTime = 0;
+vec3_t cameraPosition = {0, 0, 0};
 
-vec3_t camera_position = {.x = 0, .y = 0, .z = 0};
-vec3_t cube_rotation = {.x = 0, .y = 0, .z = 0};
+/**
+ * Array to store triangles that should be rendered each frame
+ */
+#define MAX_TRIANGLES           10000
+triangle_t trianglesToRender[MAX_TRIANGLES];
+int numTrianglesToRender = 0;
 
-bool is_running = false;
-
-int previous_frame_time = 0;
-
-mat4_t projectionMatrix;
+/**
+ * Global Transformation Matrices
+ */
+mat4_t worldMatrix;
+mat4_t projectMatrix;
 
 bool setup(void)
 {
@@ -53,13 +62,9 @@ bool setup(void)
     float aspect = ((float)window_height / (float)window_width);
     float znear = 0.1;
     float zfar = 100.0;
-    projectionMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
+    projectMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-    // Manually load the hardcoded texture data from the static array
-    // mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
-    // texture_width = 64;
-    // texture_height = 64;
-    // load_cube_mesh_data();
+    /* Load the vertex and face values for the mesh data structure */
     load_obj_file_data("C:/Users/hojoon/Developer/game_study/HORenderer/assets/f22.obj");
 
     /* Load the texture information from an external PNG file */
@@ -75,12 +80,12 @@ void process_input(void)
 
     switch (event.type) {
         case SDL_QUIT:
-            is_running = false;
+            isRunning = false;
             break;
         case SDL_KEYDOWN:
             if (event.key.keysym.sym == SDLK_ESCAPE)
             {
-                is_running = false;
+                isRunning = false;
             }
             if (event.key.keysym.sym == SDLK_1)
             {
@@ -126,15 +131,12 @@ void process_input(void)
 void update(void)
 {
     // Wait for target frame time
-    int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
-    if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
-        SDL_Delay(time_to_wait);
-    }
+    int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - previousFrameTime);
 
-    previous_frame_time = SDL_GetTicks();
+    if (timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME) { SDL_Delay(timeToWait); }
 
-    // Initialize the array of triangles to render
-    triangles_to_render = NULL;
+    previousFrameTime = SDL_GetTicks();
+    numTrianglesToRender = 0;
 
     // Change the mesh scale/rotation values per animation frame
     mesh.rotation.x += 0.01f;
@@ -152,17 +154,21 @@ void update(void)
     int num_faces = array_length(mesh.faces);
 
     for (int i = 0; i < num_faces; i++) {
-        face_t mesh_face = mesh.faces[i];
-        vec3_t face_vertices[3];
-        face_vertices[0] = mesh.vertices[mesh_face.a];
-        face_vertices[1] = mesh.vertices[mesh_face.b];
-        face_vertices[2] = mesh.vertices[mesh_face.c];
+        face_t meshFace = mesh.faces[i];
+        vec3_t faceVertices[3];
 
-        vec4_t transformed_vertices[3];
+        /**
+         * Fix here?
+         */
+        faceVertices[0] = mesh.vertices[meshFace.a];
+        faceVertices[1] = mesh.vertices[meshFace.b];
+        faceVertices[2] = mesh.vertices[meshFace.c];
+
+        vec4_t transformedVertices[3];
 
         // Loop all three vertices of this current face and apply transformations
         for (int j = 0; j < 3; j++) {
-            vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
+            vec4_t transformed_vertex = vec4_from_vec3(faceVertices[j]);
 
             // Create a World Matrix combining scale, rotation, and translation matrices
             mat4_t worldMatrix = mat4_identity();
@@ -179,81 +185,74 @@ void update(void)
             transformed_vertex = mat4_multiply_vec4(worldMatrix, transformed_vertex);
 
             // Save transformed vertex in the array of transformed vertices
-            transformed_vertices[j] = transformed_vertex;
-        }
-
-        vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]);      /* A */
-        vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]);      /* B */
-        vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]);      /* C */
-
-        // Get the vector subtraction of B-A and C-A
-        vec3_t vector_ab = vec3_sub(vector_b, vector_a);
-        vec3_t vector_ac = vec3_sub(vector_c, vector_a);
-        vec3_normalize(&vector_ab);
-        vec3_normalize(&vector_ac);
-
-        // Compute the face normal (using the cross product to find perpendicular)
-        vec3_t normal = vec3_cross(vector_ab, vector_ac);
-
-        // Normalize the face normal vector
-        vec3_normalize(&normal);
-
-        // Find the vector between a point in the triangle and the camera origin
-        vec3_t camera_ray = vec3_sub(camera_position, vector_a);
-
-        // Calculate how aligned the camera ray is with the face normal (using dot product)
-        float dot_normal_camera = vec3_dot(normal, camera_ray);
-
-        if (CullMethod == CULL_BACKFACE) {
-            // Bypass the triangles that are looking away from the camera
-            if (dot_normal_camera < 0) {
-                continue;
-            }
+            transformedVertices[j] = transformed_vertex;
         }
         
-        vec4_t projected_points[3];
+        vec3_t vectorA = vec3_from_vec4(transformedVertices[0]);
+        vec3_t vectorB = vec3_from_vec4(transformedVertices[1]);
+        vec3_t vectorC = vec3_from_vec4(transformedVertices[2]);
+        vec3_t vectorAB = vec3_sub(vectorB, vectorA);
+        vec3_t vectorAC = vec3_sub(vectorC, vectorA);
 
-        // Loop all three vertices to perform projection
-        for (int j = 0; j < 3; j++) {
-            // Project the current vertex
-            projected_points[j] = mat4_multiply_vec4_project(projectionMatrix, transformed_vertices[j]);
+        vec3_normalize(&vectorAB);
+        vec3_normalize(&vectorAC);
 
-            // Scale into the view 
-            projected_points[j].x *= (window_width / 2.0);
-            projected_points[j].y *= (window_height / 2.0);
+        /* Compute the face normal (using cross product to find perpendicular) */
+        vec3_t normal = vec3_cross(vectorAB, vectorAC);
+        vec3_normalize(&normal);
 
-            // Invert the y values to account for flipped screen y coordinate
-            // Because screen y coordinates is growing down, but model y coordinates is growing up
-            projected_points[j].y *= -1;
+        /* Find the vector between vertex A in the triangle and the camera origin */
+        vec3_t cameraRay = vec3_sub(cameraPosition, vectorA);
 
-            // Translate the projected points to the middle of the screen
-            projected_points[j].x += (window_width / 2.0);
-            projected_points[j].y += (window_height / 2.0);
+        /* Calculate how aligned the camera ray is with the face normal */
+        float dotNormalCamera = vec3_dot(normal, cameraRay);
+
+        /* Backface culling test to see if the current face should be projected */
+        if (CullMethod == CULL_BACKFACE) {
+            if (dotNormalCamera < 0) { continue; }
         }
 
-        // Calculate the shade intensity based on how aligned is the face normal and thje light vector
-        float light_intensity_factor = -vec3_dot(normal, light.direction);
-        uint32_t triangle_color = light_apply_intensity(mesh_face.color, light_intensity_factor);
+        vec4_t projectedPoints[3];
 
-        triangle_t projected_triangle = {
+        /* Loop all three vertices to perform projection and conversion to screen space */
+        for (int j = 0; j < 3; j++) {
+            /* Project the current Vertex */
+            projectedPoints[j] = mat4_multiply_vec4_project(projectMatrix, transformedVertices[j]);
+
+            /**
+             * Flip vertically since the y values of the 3D mesh grow bottom->up and in screen space
+             * y values grow top->down
+             */
+            projectedPoints[i].y *= -1;
+            
+            /* Scale into the view */
+            projectedPoints[j].x *= (window_width / 2.0);
+            projectedPoints[j].y *= (window_height / 2.0);
+
+            /* Translate the projected points to the middle of the screen */
+            projectedPoints[j].x += (window_width / 2.0);
+            projectedPoints[j].y += (window_height / 2.0);
+        }
+
+        
+        float lightIntensityFactor = -vec3_dot(normal, light.direction);
+        uint32_t triangleColor = light_apply_intensity(meshFace.color, lightIntensityFactor);
+        triangle_t projectedTriangle = {
             .points = {
-                projected_points[0].x, projected_points[0].y, projected_points[0].z, projected_points[0].w,
-                projected_points[1].x, projected_points[1].y, projected_points[1].z, projected_points[1].w,
-                projected_points[2].x, projected_points[2].y, projected_points[2].z, projected_points[2].w,
+                projectedPoints[0].x, projectedPoints[0].y, projectedPoints[0].z, projectedPoints[0].w,
+                projectedPoints[1].x, projectedPoints[1].y, projectedPoints[1].z, projectedPoints[1].w,
+                projectedPoints[2].x, projectedPoints[2].y, projectedPoints[2].z, projectedPoints[2].w
             },
             .texcoords = {
-                { mesh_face.a_uv.u, mesh_face.a_uv.v },
-                { mesh_face.b_uv.u, mesh_face.b_uv.v },
-                { mesh_face.c_uv.u, mesh_face.c_uv.v }
+                { meshFace.a_uv.u, meshFace.a_uv.v },
+                { meshFace.b_uv.u, meshFace.b_uv.v },
+                { meshFace.c_uv.u, meshFace.c_uv.v }
             },
-            .color = triangle_color,
+            .color = triangleColor
         };
 
-        // Save the projected triangle in the array of triangles to render
-        if (num_triangles_to_render < MAX_TRIANGLES) {
-            triangles_to_render[num_triangles_to_render++] = projected_triangle;
-            // array_push(triangles_to_render, projected_triangle);
-        }
+        /* Save the projected triangle in the array of triangles to render */
+        if (numTrianglesToRender < MAX_TRIANGLES) { trianglesToRender[numTrianglesToRender++] = projectedTriangle; }
     }
 }
 

@@ -67,6 +67,31 @@ void draw_texel(int x, int y, uint32_t* texture, vec4_t point_a, vec4_t point_b,
     }
 }
 
+void draw_triangle_pixel(int x, int y, uint32_t color, vec4_t point_a, vec4_t point_b, vec4_t point_c)
+{
+    vec2_t p = {x, y};
+    vec2_t a = vec2_from_vec4(point_a);
+    vec2_t b = vec2_from_vec4(point_b);
+    vec2_t c = vec2_from_vec4(point_c);
+
+    vec3_t weights = barycentric_weights(a, b, c, p);
+
+    float alpha = weights.x;
+    float beta = weights.y;
+    float gamma = weights.z;
+
+    /* Interpolate the value of 1/w for the current pixel */
+    float interpolated_reciprocal_w = (1 / point_a.w) * alpha + (1 / point_b.w) * beta + (1 / point_c.w) * gamma;
+    /* Adjust 1/w so the pixels that are closer to the camera have smaller values */
+    interpolated_reciprocal_w = 1.0 - interpolated_reciprocal_w;
+
+    /* Only draw the pixel if the depth value is less than the one previously stored in the z-buffer */
+    if (interpolated_reciprocal_w < z_buffer[(window_width * y) + x]) {
+        draw_pixel(x, y, color);
+        
+        z_buffer[(window_width * y) + x] = interpolated_reciprocal_w;
+    }
+}
 
 /**
  * Draw a filled triangle with the flat-top / flat-bottom method
@@ -139,41 +164,6 @@ void draw_filled_triangle(int x0, int y0, float z0, float w0, int x1, int y1, fl
 
             for (int x = x_start; x < x_end; x++) { draw_triangle_pixel(x, y, color, point_a, point_b, point_c); }
         }
-    }
-
-}
-
-void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
-{
-    // We need to start the vertices by y-coordinate ascending (y0 < y1 < y2)
-    if (y0 > y1) {
-        int_swap(&y0, &y1);
-        int_swap(&x0, &x1);
-    }
-
-    if (y1 > y2) {
-        int_swap(&y1, &y2);
-        int_swap(&x1, &x2);
-    }
-
-    if (y0 > y1) {
-        int_swap(&y0, &y1);
-        int_swap(&x0, &x1);
-    }
-
-    if (y1 == y2) {
-        // We can simply draw the flat-bottom triangle
-        fill_flat_bottom_triangle(x0, y0, x1, y1, x2, y2, color);
-    } else if (y0 == y1) {
-        // We can simply draw the flat-top triangle
-        fill_flat_top_triangle(x0, y0, x1, y1, x2, y2, color);
-    } else {
-        // Calculate the new vertex (Mx, My) using triangle similarity
-        int My = y1;
-        int Mx = ((float)((x2 - x0) * (y1 - y0)) / (float)(y2 - y0)) + x0;
-
-        fill_flat_bottom_triangle(x0, y0, x1, y1, Mx, My, color);
-        fill_flat_top_triangle(x1, y1, Mx, My, x2, y2, color);
     }
 }
 
