@@ -231,9 +231,6 @@ void update(void)
             projected_points[j].y += (window_height / 2.0);
         }
 
-        // Calculate the average depth for each face based on the vertices after transformation
-        float avgDepth = (transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
-
         // Calculate the shade intensity based on how aligned is the face normal and thje light vector
         float light_intensity_factor = -vec3_dot(normal, light.direction);
         uint32_t triangle_color = light_apply_intensity(mesh_face.color, light_intensity_factor);
@@ -250,22 +247,12 @@ void update(void)
                 { mesh_face.c_uv.u, mesh_face.c_uv.v }
             },
             .color = triangle_color,
-            .avgDepth = avgDepth
         };
 
         // Save the projected triangle in the array of triangles to render
-        array_push(triangles_to_render, projected_triangle);
-    }
-
-    // Sort the triangles to render by their avgDepth
-    int numTriangles = array_length(triangles_to_render);
-    for (int i = 0; i < numTriangles; i++) {
-        for (int j = i; j < numTriangles; j++) {
-            if (triangles_to_render[i].avgDepth < triangles_to_render[j].avgDepth) {
-                triangle_t temp = triangles_to_render[i];
-                triangles_to_render[i] = triangles_to_render[j];
-                triangles_to_render[j] = temp;
-            }
+        if (num_triangles_to_render < MAX_TRIANGLES) {
+            triangles_to_render[num_triangles_to_render++] = projected_triangle;
+            // array_push(triangles_to_render, projected_triangle);
         }
     }
 }
@@ -282,18 +269,18 @@ void render(void)
         // Draw filled triangle
         if (RenderMethod == RENDER_FILL_TRIANGLE || RenderMethod == RENDER_FILL_TRIANGLE_WIRE) {
             draw_filled_triangle(
-                (int)triangle.points[0].x, (int)triangle.points[0].y,
-                (int)triangle.points[1].x, (int)triangle.points[1].y,
-                (int)triangle.points[2].x, (int)triangle.points[2].y,
+                (int)triangle.points[0].x, (int)triangle.points[0].y, triangle.points[0].z, triangle.points[0].w,
+                (int)triangle.points[1].x, (int)triangle.points[1].y, triangle.points[1].z, triangle.points[1].w,
+                (int)triangle.points[2].x, (int)triangle.points[2].y, triangle.points[2].z, triangle.points[2].w,
                 triangle.color);
         }
 
         // Draw textured triangle
         if (RenderMethod == RENDER_TEXTURED || RenderMethod == RENDER_TEXTURED_WIRE) {
             draw_textured_triangle(
-                triangle.points[0].x, triangle.points[0].y, triangle.points[0].z, triangle.points[0].w, triangle.texcoords[0].u, triangle.texcoords[0].v,
-                triangle.points[1].x, triangle.points[1].y, triangle.points[1].z, triangle.points[1].w, triangle.texcoords[1].u, triangle.texcoords[1].v,
-                triangle.points[2].x, triangle.points[2].y, triangle.points[2].z, triangle.points[2].w, triangle.texcoords[2].u, triangle.texcoords[2].v,
+                (int)triangle.points[0].x, (int)triangle.points[0].y, triangle.points[0].z, triangle.points[0].w, triangle.texcoords[0].u, triangle.texcoords[0].v,
+                (int)triangle.points[1].x, (int)triangle.points[1].y, triangle.points[1].z, triangle.points[1].w, triangle.texcoords[1].u, triangle.texcoords[1].v,
+                (int)triangle.points[2].x, (int)triangle.points[2].y, triangle.points[2].z, triangle.points[2].w, triangle.texcoords[2].u, triangle.texcoords[2].v,
                 mesh_texture
             );
         }
