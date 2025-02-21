@@ -258,14 +258,15 @@ void update(void)
 
 void render(void)
 {
+    SDL_RenderClear(renderer);
+
     draw_grid(0xFF333333);
     
-    // Loop all projected points and render them
-    int num_triangles = array_length(triangles_to_render);
-    for (int i = 0; i < num_triangles; i++) {
-        triangle_t triangle = triangles_to_render[i];
+    /* Loop all projected triangles and render */
+    for (int i = 0; i < numTrianglesToRender; i++) {
+        triangle_t triangle = trianglesToRender[i];
 
-        // Draw filled triangle
+        /* Draw Filled Triangle */
         if (RenderMethod == RENDER_FILL_TRIANGLE || RenderMethod == RENDER_FILL_TRIANGLE_WIRE) {
             draw_filled_triangle(
                 (int)triangle.points[0].x, (int)triangle.points[0].y, triangle.points[0].z, triangle.points[0].w,
@@ -274,7 +275,7 @@ void render(void)
                 triangle.color);
         }
 
-        // Draw textured triangle
+        /* Draw Textured Triangle */
         if (RenderMethod == RENDER_TEXTURED || RenderMethod == RENDER_TEXTURED_WIRE) {
             draw_textured_triangle(
                 (int)triangle.points[0].x, (int)triangle.points[0].y, triangle.points[0].z, triangle.points[0].w, triangle.texcoords[0].u, triangle.texcoords[0].v,
@@ -284,7 +285,7 @@ void render(void)
             );
         }
 
-        // Draw triangle wireframe
+        /* Draw Triangle Wireframe */
         if (RenderMethod == RENDER_WIRE || RenderMethod == RENDER_WIRE_VERTEX || RenderMethod == RENDER_FILL_TRIANGLE_WIRE || RenderMethod == RENDER_TEXTURED_WIRE) {
             draw_triangle(
                 (int)triangle.points[0].x, (int)triangle.points[0].y,
@@ -293,16 +294,13 @@ void render(void)
                 0xFFFFFFFF);
         }
 
-        // Draw triangle vertex points
+        /* Draw Triangle Vertex Points */
         if (RenderMethod == RENDER_WIRE_VERTEX) {
             draw_rectangle(triangle.points[0].x - 3, triangle.points[0].y - 3, 6, 6, 0xFFFF0000);
             draw_rectangle(triangle.points[1].x - 3, triangle.points[1].y - 3, 6, 6, 0xFFFF0000);
             draw_rectangle(triangle.points[2].x - 3, triangle.points[2].y - 3, 6, 6, 0xFFFF0000);
         }
     }
-
-    // Clear the array of triangles to render every frame loop
-    array_free(triangles_to_render);
     
     render_color_buffer();
 
@@ -323,18 +321,15 @@ void free_resources(void)
 
 int main(int argc, char* argv[])
 {
-    is_running = initialize_window();
+    isRunning = initialize_window();
+    isRunning = setup();
 
-    is_running = setup();
-
-    vec3_t my_vector = {2.0, 3.0, -1.0};        // Just for test
-
-    while(is_running) {
+    while (isRunning) {
         process_input();
         update();
         render();
     }
-
+    
     destroy_window();
     free_resources();
 
