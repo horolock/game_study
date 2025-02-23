@@ -30,36 +30,32 @@ mat4_t projectMatrix;
 
 bool setup(void)
 {
-    // Initialize render mode and triangle culling method.
+    /* Initialize render mode and triangle culling method */
     RenderMethod = RENDER_WIRE;
     CullMethod = CULL_BACKFACE;
 
-    // Allocate the required bytes in memory for the color buffer and the z-buffer
-    color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);   
-    z_buffer = (float*)malloc(sizeof(float) * window_width * window_height);
+    /* Allocate the required bytes in memory for the color buffer and the z-buffer */
+    colorBuffer = (uint32_t*)malloc(sizeof(uint32_t) * windowWidth * windowHeight);
+    zBuffer = (float*)malloc(sizeof(float) * windowWidth * windowHeight);
 
-    // Check color buffer successfully allocated
-    if (!color_buffer) {
-        fprintf(stderr, "Allocating color buffer failed.\n");
+    if (!colorBuffer) {
+        fprintf(stderr, "Allocating Color Buffer Failed.\n");
         return false;
     }
 
-    color_buffer_texture = SDL_CreateTexture(
-        renderer,
-        SDL_PIXELFORMAT_RGBA32,
-        SDL_TEXTUREACCESS_STREAMING,
-        window_width,
-        window_height
+    colorBufferTexture = SDL_CreateTexture(
+        renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING,
+        windowWidth, windowHeight
     );
 
-    if (!color_buffer_texture) {
-        fprintf(stderr, "Error creating SDL Texture.\n");
+    if (!colorBufferTexture) {
+        fprintf(stderr, "Error Creating SDL Texture.\n");
         return false;
     }
 
     /* Initialize the perspective projection matrix */
     float fov = M_PI / 3.0;
-    float aspect = ((float)window_height / (float)window_width);
+    float aspect = ((float)windowHeight / (float)windowWidth);
     float znear = 0.1;
     float zfar = 100.0;
     projectMatrix = mat4_make_perspective(fov, aspect, znear, zfar);
@@ -226,14 +222,13 @@ void update(void)
             projectedPoints[i].y *= -1;
             
             /* Scale into the view */
-            projectedPoints[j].x *= (window_width / 2.0);
-            projectedPoints[j].y *= (window_height / 2.0);
+            projectedPoints[j].x *= (windowWidth / 2.0);
+            projectedPoints[j].y *= (windowHeight / 2.0);
 
             /* Translate the projected points to the middle of the screen */
-            projectedPoints[j].x += (window_width / 2.0);
-            projectedPoints[j].y += (window_height / 2.0);
+            projectedPoints[j].x += (windowWidth / 2.0);
+            projectedPoints[j].y += (windowHeight / 2.0);
         }
-
         
         float lightIntensityFactor = -vec3_dot(normal, light.direction);
         uint32_t triangleColor = light_apply_intensity(meshFace.color, lightIntensityFactor);
@@ -312,8 +307,8 @@ void render(void)
 
 void free_resources(void)
 {
-    free(color_buffer);
-    free(z_buffer);
+    free(colorBuffer);
+    free(zBuffer);
     upng_free(png_texture);
     array_free(mesh.vertices);
     array_free(mesh.faces);

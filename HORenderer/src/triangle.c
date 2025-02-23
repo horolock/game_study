@@ -2,12 +2,111 @@
 #include "triangle.h"
 #include "swap.h"
 
-void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
+vec3_t barycentricWeights(vec2_t a, vec2_t b, vec2_t c, vec2_t p)
 {
-    draw_line(x0, y0, x1, y1, color);
-    draw_line(x1, y1, x2, y2, color);
-    draw_line(x2, y2, x0, y0, color);
+    vec2_t ac = vec2_sub(c, a);
+    vec2_t ab = vec2_sub(b, a);
+    vec2_t pc = vec2_sub(c, p);
+    vec2_t pb = vec2_sub(b, p);
+    vec2_t ap = vec2_sub(p, a);
+
+    /**
+     * Area of the full paralleleogram (triangle ABC) using cross product
+     * | ac.x | \/ | ab.x |
+     * | ac.y | /\ | ab.y |
+     * ac.x * ab.y - ac.y * ab.x
+     */
+    float areaParallelogramABC = (ac.x * ab.y) - (ac.y * ab.x);
+
+    /**
+     * Alpha = area of parallelogram PBC over the area of the full parallelogram ABC
+     * || PC x PB ||
+     * -------------
+     * || AC x AB ||
+     * 
+     * Beta = area of parallelogram APC over the area of the full parallelogram ABC
+     * || AC x AP ||
+     * -------------
+     * || AC x AB ||
+     * 
+     * Gamma can be easily found since barycentric coordinates alwasy add up to 1.0
+     * gamma = 1.0 - alpha - beta
+     */
+    float alpha = ((pc.x * pb.y) - (pc.y * pb.x)) / areaParallelogramABC;
+    float beta = ((ac.x * ap.y) - (ac.y * ap.x)) / areaParallelogramABC;
+    float gamma = 1.0 - alpha - beta;
+
+    vec3_t weights = {alpha, beta, gamma};
+
+    return weights;
 }
+
+void drawTrianglePixel(Point p, uint32_t color, vec4_t pointA, vec4_t pointB, vec4_t pointC) {
+    /* Create three vec2 to find the interpolation */
+    vec2_t targetPoint = {p.x, p.y};
+    vec2_t a = vec2_from_vec4(pointA);
+    vec2_t b = vec2_from_vec4(pointB);
+    vec2_t c = vec2_from_vec4(pointC);
+
+    /* Calculate barycentric coordinates of 'targetPoint' which is inside the triangle */
+    vec3_t weights = barycentricWeights(a, b, c, targetPoint);
+
+    float alpha = weights.x;
+    float beta = weights.y;
+    float gamma = weights.z;
+
+    /* Interpolate the value of 1/w for the current pixel */
+    float interpolatedReciprocalW = (1 / pointA.w) * alpha + (1 / pointB.w) * beta + (1 / pointC.w) * gamma;
+
+    /* Adjust 1/w so the pixels that are closer to the camera have smaller values */
+    interpolatedReciprocalW = 1.0 - interpolatedReciprocalW;
+
+    /* Only draw the pixel if the depth value is less than the one previously stored in the z-buffer */
+    if (interpolatedReciprocalW < zBuffer[(windowWidth * p.y) + p.x]) {
+        drawPixel(p, color);
+
+        /* Update the z-buffer value with the 1/w of this current pixel */
+        zBuffer[(windowWidth * p.y) + p.x] = interpolatedReciprocalW;
+    }
+}
+
+void drawTriangleTexel(vec2_t p, uint32_t* texture, vec4_t pointA, vec4_t pointB, vec4_t pointC, tex2_t aUV, tex2_t bUV, tex2_t cUV) {
+    vec2_t a = vec2_from_vec4(pointA);
+    vec2_t b = vec2_from_vec4(pointB);
+    vec2_t c = vec2_from_vec4(pointC);
+
+    /* Calculate the barycentric coordinates of our point 'p' inside the triangle */
+    vec3_t weights = barycentricWeights(a, b, c, p);
+
+    float alpha = weights.x;
+    float beta = weights.y;
+    float gamma = weights.z;
+
+    /* Variables to store the interpolated values of U, V, and also 1/w for the current pixel */
+    float interpolatedU;
+    float interpolatedV;
+    float interpolatedReciprocalW;
+
+    /* Perform the interpolation of all U/w and V/w values using barycentric weights and a factor of 1/w */
+    interpolatedU = (aUV.u / pointA.w) * alpha + (bUV.u / pointB.w) * beta + (cUV.u / pointC.w) * gamma;
+    interpolatedV = (aUV.v / pointA.w) * alpha + (bUV.v / pointB.w) * beta + (cUV.v / pointC.w) * gamma;
+
+    interpolatedReciprocalW = (1 / pointA.w) * alpha + (1 / pointB.w) * beta + (1 / pointC.w) * gamma;
+
+    /* Divide back both interpolated values by 1/w */
+}
+
+void drawTriangle(Point p0, Point p1, Point p2, uint32_t color) {
+    drawLine(p0, p1, color);
+    drawLine(p1, p2, color);
+    drawLine(p2, p0, color);
+}
+
+void drawFilledTriangle(Point4 p0, Point4 p1, Point4 p2, uint32_t color) {
+
+}
+void drawTexturedTriangle(TexturePoint p0, TexturePoint p1, TexturePoint p2, uint32_t* texture);
+
 
 /**
  * Function to draw the textured pixel at position x and y using interpolation
@@ -270,43 +369,4 @@ void draw_textured_triangle(
             }
         }
     }
-}
-
-vec3_t barycentric_weights(vec2_t a, vec2_t b, vec2_t c, vec2_t p)
-{
-    vec2_t ac = vec2_sub(c, a);
-    vec2_t ab = vec2_sub(b, a);
-    vec2_t pc = vec2_sub(c, p);
-    vec2_t pb = vec2_sub(b, p);
-    vec2_t ap = vec2_sub(p, a);
-
-    /**
-     * Area of the full paralleleogram (triangle ABC) using cross product
-     * | ac.x | \/ | ab.x |
-     * | ac.y | /\ | ab.y |
-     * ac.x * ab.y - ac.y * ab.x
-     */
-    float area_parallelogram_abc = (ac.x * ab.y) - (ac.y * ab.x);
-
-    /**
-     * Alpha = area of parallelogram PBC over the area of the full parallelogram ABC
-     * || PC x PB ||
-     * -------------
-     * || AC x AB ||
-     * 
-     * Beta = area of parallelogram APC over the area of the full parallelogram ABC
-     * || AC x AP ||
-     * -------------
-     * || AC x AB ||
-     * 
-     * Gamma can be easily found since barycentric coordinates alwasy add up to 1.0
-     * gamma = 1.0 - alpha - beta
-     */
-    float alpha = ((pc.x * pb.y) - (pc.y * pb.x)) / area_parallelogram_abc;
-    float beta = ((ac.x * ap.y) - (ac.y * ap.x)) / area_parallelogram_abc;
-    float gamma = 1.0 - alpha - beta;
-
-    vec3_t weights = {alpha, beta, gamma};
-
-    return weights;
 }
