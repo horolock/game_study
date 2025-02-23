@@ -25,4 +25,7 @@ typedef struct
     float v;
 } TexturePoint;
 
+void swapPoint4(Point4 *p0, Point4 *p1);
+void swapTexturePoint(TexturePoint *p0, TexturePoint *p1);
+
 #endif /* POINT_H_ */

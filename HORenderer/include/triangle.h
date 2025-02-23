@@ -11,7 +11,7 @@ typedef struct {
     int a;
     int b;
     int c;
-    tex2_t a_uv;
+    tex2_t a_uv;0
     tex2_t b_uv;
     tex2_t c_uv;
     uint32_t color;
@@ -25,6 +25,6 @@ typedef struct {
 
 void drawTriangle(Point p0, Point p1, Point p2, uint32_t color);
 void drawFilledTriangle(Point4 p0, Point4 p1, Point4 p2, uint32_t color);
-void drawTexturedTriangle(TexturePoint p0, TexturePoint p1, TexturePoint p2, uint32_t* texture);
+void drawTexturedTriangle(TexturePoint p, TexturePoint p1, TexturePoint p2, uint32_t* texture);
 
 #endif /* TRIANGLE_H */
